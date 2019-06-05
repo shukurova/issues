@@ -1,0 +1,47 @@
+GET http://localhost:8080/api/users
+Accept: application/json
+
+###
+
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{"name": "Vasya"}
+
+###
+
+DELETE http://localhost:8080/api/users/2
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/api/issues
+Accept: application/json
+
+###
+
+POST http://localhost:8080/api/issues
+Content-Type: application/json
+
+{}
+
+###
+
+GET http://localhost:8080/api/repos
+Accept: application/json
+
+###
+
+POST http://localhost:8080/api/repos
+Content-Type: application/json
+
+{"name": "todo-repo",
+"user_id": "4"}
+
+###
+
+DELETE http://localhost:8080/api/repos/8
+Accept: application/json
+
+###
+

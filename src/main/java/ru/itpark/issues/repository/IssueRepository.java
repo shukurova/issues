@@ -15,26 +15,28 @@ public class IssueRepository {
     private final NamedParameterJdbcTemplate template;
 
     public List<Issue> getAll() {
-        return template.query("SELECT id, name, description, date, rate, tags FROM issues",
+        return template.query("SELECT id, repo_id, name, description, date, rate, tags[], owner_id, assignment_id FROM issues",
                 new BeanPropertyRowMapper<>(Issue.class));
     }
 
     public void save(Issue issue) {
         if (issue.getId() == 0) {
-            template.update("INSERT INTO issues (name, description, date, rate, tags) VALUES (:name, :description, :date, :rate, :tags)",
-                    Map.of("name", issue.getName(),
+            template.update("INSERT INTO issues (repo_id, name, description, tags, owner_id, assignment_id) VALUES (:name, :description, :tags)",
+                    Map.of("repo_id", issue.getRepoId(),
+                            "name", issue.getName(),
                             "description", issue.getDescription(),
-                            "date", issue.getDate(),
-                            "rate", issue.getRate(),
-                            "tags", issue.getTags()));
+                            "tags", issue.getTags(),
+                            "owner_id", issue.getOwnerId(),
+                            "assignment_id", issue.getAssignmentId()));
             return;
         }
-        template.update("UPDATE issues SET name = :name, description = :description, date = :date, rate = :rate, tags = :tags",
-                Map.of("name", issue.getName(),
+        template.update("UPDATE issues SET repo_id = :repo_id, name = :name, description = :description, tags = :tags, owner_id = :owner_id, assignment_id = :assignment_id",
+                Map.of("repo_id", issue.getRepoId(),
+                        "name", issue.getName(),
                         "description", issue.getDescription(),
-                        "date", issue.getDate(),
-                        "rate", issue.getRate(),
-                        "tags", issue.getTags()));
+                        "tags", issue.getTags(),
+                        "owner_id", issue.getOwnerId(),
+                        "assignment_id", issue.getAssignmentId()));
     }
 
     public void delete(long id) {
@@ -42,14 +44,8 @@ public class IssueRepository {
                 Map.of("id", id));
     }
 
-    public Issue getById(long id) {
-        return (Issue) template.query("SELECT id, name, description, date, rate, tags FROM issues WHERE id = :id",
-                Map.of("id", id),
-                new BeanPropertyRowMapper<>(Issue.class));
-    }
-
     public List<Issue> findByParam(String param) {
-        return template.query("SELECT id, name, description, date, rate, tags FROM issues WHERE name LIKE ('%' || :param || '%') OR description LIKE ('%' || :param || '%') OR tags LIKE ('%' || :param || '%')",
+        return template.query("SELECT id, name, description, date, rate, tags, owner_id, assignment_id FROM issues WHERE name LIKE ('%' || :param || '%') OR description LIKE ('%' || :param || '%') OR tags LIKE ('%' || :param || '%')",
                 Map.of("param", param),
                 new BeanPropertyRowMapper<>(Issue.class));
     }

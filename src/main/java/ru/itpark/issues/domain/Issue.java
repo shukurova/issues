@@ -12,9 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 public class Issue {
     private long id;
+    private long repoId;
     private String name;
     private String description;
     private LocalDate date;
     private int rate;
     private List<String> tags;
+    private long ownerId;
+    private long assignmentId;
 }
