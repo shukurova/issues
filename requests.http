@@ -6,11 +6,13 @@ Accept: application/json
 POST http://localhost:8080/api/users
 Content-Type: application/json
 
-{"name": "Vasya"}
+{
+  "name": "Vasya"
+}
 
 ###
 
-DELETE http://localhost:8080/api/users/2
+DELETE http://localhost:8080/api/users/5
 Content-Type: application/json
 
 ###
@@ -35,12 +37,57 @@ Accept: application/json
 POST http://localhost:8080/api/repos
 Content-Type: application/json
 
-{"name": "todo-repo",
-"user_id": "4"}
+{
+  "name": "todo-repo-check-check",
+  "userId": 1
+}
 
 ###
 
-DELETE http://localhost:8080/api/repos/8
+DELETE http://localhost:8080/api/repos/12
+Accept: application/json
+
+###
+
+GET http://localhost:8080/api/teams
+Accept: application/json
+
+###
+
+POST http://localhost:8080/api/teams
+Content-Type: application/json
+
+{
+  "userId": 3,
+  "repoId": 10
+}
+
+###
+
+GET http://localhost:8080/api/issues
+Accept: application/json
+
+###
+
+POST http://localhost:8080/api/issues
+Content-Type: application/json
+
+{
+  "id": 1,
+  "repoId": 10,
+  "name": "Second Issue",
+  "description": "First Description",
+  "tags": [
+    "bug",
+    "normal"
+  ],
+  "ownerId": 4,
+  "assignmentId": 4
+}
+
+###
+
+GET http://localhost:8080/api/issues/?param=Second
 Accept: application/json
 
 ###

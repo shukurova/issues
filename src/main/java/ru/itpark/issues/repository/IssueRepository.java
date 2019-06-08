@@ -6,6 +6,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.itpark.issues.domain.Issue;
 
+import java.sql.Array;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +18,22 @@ public class IssueRepository {
     private final NamedParameterJdbcTemplate template;
 
     public List<Issue> getAll() {
-        return template.query("SELECT id, repo_id, name, description, date, rate, tags[], owner_id, assignment_id FROM issues",
-                new BeanPropertyRowMapper<>(Issue.class));
+        return template.query("SELECT id, repo_id, name, description, date, rate, tags, owner_id, assignment_id FROM issues", (rs, i) -> new Issue(
+                rs.getLong("id"),
+                rs.getLong("repo_id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getDate("date"),
+                rs.getInt("rate"),
+                Arrays.asList((String[]) rs.getArray("tags").getArray()),
+                rs.getLong("owner_id"),
+                rs.getLong("assignment_id")
+        ));
     }
 
     public void save(Issue issue) {
         if (issue.getId() == 0) {
-            template.update("INSERT INTO issues (repo_id, name, description, tags, owner_id, assignment_id) VALUES (:name, :description, :tags)",
+            template.update("INSERT INTO issues (repo_id, name, description, tags, owner_id, assignment_id) VALUES (:repo_id, :name, :description, ARRAY[ :tags ], :owner_id, :assignment_id)",
                     Map.of("repo_id", issue.getRepoId(),
                             "name", issue.getName(),
                             "description", issue.getDescription(),
@@ -30,11 +42,21 @@ public class IssueRepository {
                             "assignment_id", issue.getAssignmentId()));
             return;
         }
-        template.update("UPDATE issues SET repo_id = :repo_id, name = :name, description = :description, tags = :tags, owner_id = :owner_id, assignment_id = :assignment_id",
-                Map.of("repo_id", issue.getRepoId(),
+
+        Array tags = null;
+        try {
+            tags = template.getJdbcTemplate().getDataSource()
+                .getConnection()
+                .createArrayOf("TEXT", List.of(issue.getTags()).toArray());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        template.update("UPDATE issues SET repo_id = :repo_id, name = :name, description = :description, tags = :tags, owner_id = :owner_id, assignment_id = :assignment_id WHERE id = :id",
+                Map.of("id", issue.getId(),
+                        "repo_id", issue.getRepoId(),
                         "name", issue.getName(),
                         "description", issue.getDescription(),
-                        "tags", issue.getTags(),
+                        "tags", tags,
                         "owner_id", issue.getOwnerId(),
                         "assignment_id", issue.getAssignmentId()));
     }
