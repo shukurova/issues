@@ -73,22 +73,26 @@ POST http://localhost:8080/api/issues
 Content-Type: application/json
 
 {
-  "id": 1,
-  "repoId": 10,
+  "repoId": 11,
   "name": "Second Issue",
-  "description": "First Description",
+  "description": "Second Description",
   "tags": [
     "bug",
-    "normal"
+    "critical"
   ],
-  "ownerId": 4,
-  "assignmentId": 4
+  "ownerId": 6,
+  "assignmentId": 3
 }
 
 ###
 
 GET http://localhost:8080/api/issues/?param=Second
 Accept: application/json
+
+###
+
+DELETE http://localhost:8080/api/issues/6
+Content-Type: application/json
 
 ###
 
