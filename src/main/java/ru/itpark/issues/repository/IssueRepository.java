@@ -1,7 +1,6 @@
 package ru.itpark.issues.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.itpark.issues.domain.Issue;
@@ -37,7 +36,7 @@ public class IssueRepository {
             try {
                 tags = template.getJdbcTemplate().getDataSource()
                         .getConnection()
-                        .createArrayOf("TEXT", List.of(issue.getTags()).toArray());
+                        .createArrayOf("TEXT", issue.getTags().toArray());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -56,7 +55,7 @@ public class IssueRepository {
         try {
             tags = template.getJdbcTemplate().getDataSource()
                     .getConnection()
-                    .createArrayOf("TEXT", List.of(issue.getTags()).toArray());
+                    .createArrayOf("TEXT", issue.getTags().toArray());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -77,7 +76,7 @@ public class IssueRepository {
     }
 
     public List<Issue> findByParam(String param) {
-        return template.query("SELECT id, repo_id, name, description, date, rate, tags, owner_id, assignment_id FROM issues WHERE name LIKE ( '%' || :param || '%') OR description LIKE ( '%' || :param || '%') OR ( '%' || :param || '%') = ANY(tags);",
+        return template.query("SELECT id, repo_id, name, description, date, rate, tags, owner_id, assignment_id FROM issues WHERE name LIKE ( '%' || :param || '%') OR description LIKE ( '%' || :param || '%') OR (:param) = ANY(tags);",
                 Map.of("param", param),
                 (rs, i) -> new Issue(
                         rs.getLong("id"),
